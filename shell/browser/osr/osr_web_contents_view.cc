@@ -144,7 +144,10 @@ OffScreenWebContentsView::CreateViewForChildWidget(
 
 void OffScreenWebContentsView::SetPageTitle(const base::string16& title) {}
 
-void OffScreenWebContentsView::RenderViewReady() {}
+void OffScreenWebContentsView::RenderViewReady() {
+  if (GetView())
+    GetView()->InstallTransparency();
+}
 
 void OffScreenWebContentsView::RenderViewHostChanged(
     content::RenderViewHost* old_host,
