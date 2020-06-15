@@ -52,6 +52,8 @@ class ScriptExecutor;
 }
 #endif
 
+#include "discord/overlay.h"
+
 namespace blink {
 struct WebDeviceEmulationParams;
 }
@@ -136,6 +138,12 @@ class WebContents : public gin_helper::TrackableObject<WebContents>,
                     public CommonWebContentsDelegate,
                     public content::WebContentsObserver,
                     public mojom::ElectronBrowser {
+ public:
+  void SetDiscordOverlayProcessID(uint32_t process_id);
+
+ private:
+  discord::Overlay overlay_ = {};
+
  public:
   enum class Type {
     BACKGROUND_PAGE,  // An extension background page.
