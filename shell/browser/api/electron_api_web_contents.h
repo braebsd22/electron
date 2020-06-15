@@ -19,6 +19,7 @@
 #include "content/public/browser/render_widget_host.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_observer.h"
+#include "content/public/common/drop_data.h"
 #include "electron/buildflags/buildflags.h"
 #include "electron/shell/common/api/api.mojom.h"
 #include "gin/handle.h"
@@ -401,6 +402,13 @@ class WebContents : public gin_helper::TrackableObject<WebContents>,
     return script_executor_.get();
   }
 #endif
+
+  bool start_dragging = false;
+  bool dragging = false;
+  content::DropData drop_data;
+  blink::WebDragOperationsMask drag_ops = blink::kWebDragOperationNone;
+  gfx::ImageSkia drag_image;
+  gfx::Vector2d drag_image_offset;
 
  protected:
   // Does not manage lifetime of |web_contents|.
