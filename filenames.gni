@@ -22,6 +22,11 @@ filenames = {
   ]
 
   lib_sources = [
+    "discord/overlay.h",
+    "discord/overlay_linux.cc",
+    "discord/overlay_mac.cc",
+    "discord/overlay_win.cc",
+
     "shell/app/atom_content_client.cc",
     "shell/app/atom_content_client.h",
     "shell/app/atom_main_delegate.cc",
