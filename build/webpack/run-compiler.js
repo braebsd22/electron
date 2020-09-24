@@ -1,3 +1,4 @@
+const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
 
@@ -9,7 +10,9 @@ config.output = {
   filename: path.basename(outPath)
 }
 
-webpack(config, (err, stats) => {
+const { wrapInitWithTryCatch, ...webpackConfig } = config;
+
+webpack(webpackConfig, (err, stats) => {
   if (err) {
     console.error(err)
     process.exit(1)
@@ -17,6 +20,16 @@ webpack(config, (err, stats) => {
     console.error(stats.toString('normal'))
     process.exit(1)
   } else {
+    let contents = fs.readFileSync(outPath, 'utf8');
+    if (wrapInitWithTryCatch) {
+      contents = `try {
+${contents}
+} catch (err) {
+  console.error('Electron ${webpackConfig.output.filename} script failed to run');
+  console.error(err);
+}`;
+    }
+    fs.writeFileSync(outPath, contents)
     process.exit(0)
   }
 })

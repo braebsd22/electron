@@ -3,13 +3,12 @@
 // found in the LICENSE file.
 
 #include "shell/common/node_util.h"
+#include "base/logging.h"
 #include "shell/common/node_includes.h"
 #include "third_party/electron_node/src/node_native_module_env.h"
 
 namespace electron {
-
 namespace util {
-
 v8::MaybeLocal<v8::Value> CompileAndCall(
     v8::Local<v8::Context> context,
     const char* id,
@@ -17,6 +16,7 @@ v8::MaybeLocal<v8::Value> CompileAndCall(
     std::vector<v8::Local<v8::Value>>* arguments,
     node::Environment* optional_env) {
   v8::Isolate* isolate = context->GetIsolate();
+  v8::TryCatch try_catch(isolate);
   v8::MaybeLocal<v8::Function> compiled =
       node::native_module::NativeModuleEnv::LookupAndCompile(
           context, id, parameters, optional_env);
@@ -26,8 +26,15 @@ v8::MaybeLocal<v8::Value> CompileAndCall(
   v8::Local<v8::Function> fn = compiled.ToLocalChecked().As<v8::Function>();
   return fn->Call(context, v8::Null(isolate), arguments->size(),
                   arguments->data());
+  v8::MaybeLocal<v8::Value> ret = fn->Call(
+      context, v8::Null(isolate), arguments->size(), arguments->data());
+  // This will only be caught when something has gone terrible wrong as all
+  // electron scripts are wrapped in a try {} catch {} in run-compiler.js
+  if (try_catch.HasCaught()) {
+    LOG(ERROR) << "Failed to CompileAndCall electron script: " << id;
+  }
+  return ret;
 }
 
 }  // namespace util
-
 }  // namespace electron
